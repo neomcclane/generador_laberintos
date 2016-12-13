@@ -55,4 +55,9 @@ func (l *laberinto) generarEntrada() {
 	}
 
 	l.matriz[randFila][randColumna] = "e"
+	l.escabar()
+}
+
+func (l *laberinto) escabar() {
+
 }
