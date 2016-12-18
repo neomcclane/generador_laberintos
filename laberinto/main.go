@@ -9,14 +9,18 @@ import (
 
 const ESPACIO = "."
 const PARED = "#"
+const SALIDA = "S"
+const ENTRADA = "E"
 
 type laberinto struct {
 	Fila    int
 	Columna int
 	matriz  [][]string
 
-	pColumna int
-	pFila    int
+	pColumna       int
+	pFila          int
+	pInicioFila    int
+	pInicioColumna int
 
 	vPared  [][]int
 	vCamino [][]int
@@ -73,9 +77,11 @@ func (l *laberinto) generarEntrada() {
 		}
 	}
 
-	l.matriz[randFila][randColumna] = "e"
+	l.matriz[randFila][randColumna] = ENTRADA
 	l.pFila = randFila
 	l.pColumna = randColumna
+	l.pInicioFila = l.pFila
+	l.pInicioColumna = l.pColumna
 	l.encontrarPuntoInicio()
 }
 
@@ -92,7 +98,8 @@ func (l *laberinto) encontrarPuntoInicio() {
 	} else if l.pFila == l.Fila-1 {
 		l.pFila = l.pFila - 1
 	}
-	l.matriz[l.pFila][l.pColumna] = "."
+	l.matriz[l.pFila][l.pColumna] = ESPACIO
+
 	l.vPared = append(l.vPared, []int{l.pFila, l.pColumna})
 	l.escavar()
 }
@@ -135,27 +142,27 @@ func (l *laberinto) escavar() {
 	// fmt.Println(l.pFila, l.pColumna)
 	vAuxiliarCamino := make([][]int, 0)
 
-	if l.pColumna > 1 && l.existeParedCamino([]int{l.pFila, l.pColumna - 1}) && strings.EqualFold(l.matriz[l.pFila][l.pColumna-1], "#") { // izquierda
+	if l.pColumna > 1 && l.existeParedCamino([]int{l.pFila, l.pColumna - 1}) && strings.EqualFold(l.matriz[l.pFila][l.pColumna-1], PARED) { // izquierda
 		vAuxiliarCamino = append(vAuxiliarCamino, []int{l.pFila, l.pColumna - 1})
 
 	}
-	if l.pColumna < l.Columna-2 && l.existeParedCamino([]int{l.pFila, l.pColumna + 1}) && strings.EqualFold(l.matriz[l.pFila][l.pColumna+1], "#") { // derecha
+	if l.pColumna < l.Columna-2 && l.existeParedCamino([]int{l.pFila, l.pColumna + 1}) && strings.EqualFold(l.matriz[l.pFila][l.pColumna+1], PARED) { // derecha
 		vAuxiliarCamino = append(vAuxiliarCamino, []int{l.pFila, l.pColumna + 1})
 
 	}
-	if l.pFila > 1 && l.existeParedCamino([]int{l.pFila - 1, l.pColumna}) && strings.EqualFold(l.matriz[l.pFila-1][l.pColumna], "#") { // arriba
+	if l.pFila > 1 && l.existeParedCamino([]int{l.pFila - 1, l.pColumna}) && strings.EqualFold(l.matriz[l.pFila-1][l.pColumna], PARED) { // arriba
 		vAuxiliarCamino = append(vAuxiliarCamino, []int{l.pFila - 1, l.pColumna})
 
 	}
-	if l.pFila < l.Fila-2 && l.existeParedCamino([]int{l.pFila + 1, l.pColumna}) && strings.EqualFold(l.matriz[l.pFila+1][l.pColumna], "#") { //abajo
+	if l.pFila < l.Fila-2 && l.existeParedCamino([]int{l.pFila + 1, l.pColumna}) && strings.EqualFold(l.matriz[l.pFila+1][l.pColumna], PARED) { //abajo
 		vAuxiliarCamino = append(vAuxiliarCamino, []int{l.pFila + 1, l.pColumna})
 
 	}
 
 	if len(vAuxiliarCamino) > 1 {
-		time.Sleep(time.Nanosecond * 2521)
+		time.Sleep(time.Nanosecond * 4889)
 		rand.Seed(time.Now().UTC().UnixNano())
-		tam := rand.Intn(len(vAuxiliarCamino)-1) + 1 // ojo, si se le suma 1 o no XD
+		tam := rand.Intn(len(vAuxiliarCamino)-1) + 1
 
 		for i := 0; i < tam; i++ {
 			pos := rand.Intn(len(vAuxiliarCamino))
@@ -181,5 +188,47 @@ func (l *laberinto) escavar() {
 		l.vPared = append(l.vPared, []int{l.pFila, l.pColumna})
 		l.matriz[l.pFila][l.pColumna] = ESPACIO
 		l.escavar()
+	} else {
+		l.generarSalida()
+	}
+}
+
+func (l *laberinto) generarSalida() {
+
+	switch {
+	case l.pInicioFila == 0:
+		fmt.Println("abajo")
+		for columna := 1; columna < l.Columna-2; columna++ {
+			if strings.EqualFold(l.matriz[l.Fila-2][columna], ESPACIO) {
+				l.matriz[l.Fila-1][columna] = SALIDA
+				break
+			}
+		}
+
+	case l.pInicioFila == l.Fila-1:
+		fmt.Println("arriba")
+		for columna := 1; columna < l.Columna-2; columna++ {
+			if strings.EqualFold(l.matriz[1][columna], ESPACIO) {
+				l.matriz[0][columna] = SALIDA
+				break
+			}
+		}
+
+	case l.pInicioColumna == 0:
+		fmt.Println("derecha")
+		for fila := 1; fila < l.Fila-2; fila++ {
+			if strings.EqualFold(l.matriz[fila][l.Columna-2], ESPACIO) {
+				l.matriz[fila][l.Columna-1] = SALIDA
+				break
+			}
+		}
+	case l.pInicioColumna == l.Columna-1:
+		fmt.Println("izquierda")
+		for fila := 1; fila < l.Fila-2; fila++ {
+			if strings.EqualFold(l.matriz[fila][1], ESPACIO) {
+				l.matriz[fila][0] = SALIDA
+				break
+			}
+		}
 	}
 }
