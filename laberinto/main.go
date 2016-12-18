@@ -197,7 +197,7 @@ func (l *laberinto) generarSalida() {
 
 	switch {
 	case l.pInicioFila == 0:
-		fmt.Println("abajo")
+
 		for columna := 1; columna < l.Columna-2; columna++ {
 			if strings.EqualFold(l.matriz[l.Fila-2][columna], ESPACIO) {
 				l.matriz[l.Fila-1][columna] = SALIDA
@@ -206,7 +206,7 @@ func (l *laberinto) generarSalida() {
 		}
 
 	case l.pInicioFila == l.Fila-1:
-		fmt.Println("arriba")
+
 		for columna := 1; columna < l.Columna-2; columna++ {
 			if strings.EqualFold(l.matriz[1][columna], ESPACIO) {
 				l.matriz[0][columna] = SALIDA
@@ -215,7 +215,7 @@ func (l *laberinto) generarSalida() {
 		}
 
 	case l.pInicioColumna == 0:
-		fmt.Println("derecha")
+
 		for fila := 1; fila < l.Fila-2; fila++ {
 			if strings.EqualFold(l.matriz[fila][l.Columna-2], ESPACIO) {
 				l.matriz[fila][l.Columna-1] = SALIDA
@@ -223,7 +223,7 @@ func (l *laberinto) generarSalida() {
 			}
 		}
 	case l.pInicioColumna == l.Columna-1:
-		fmt.Println("izquierda")
+
 		for fila := 1; fila < l.Fila-2; fila++ {
 			if strings.EqualFold(l.matriz[fila][1], ESPACIO) {
 				l.matriz[fila][0] = SALIDA
